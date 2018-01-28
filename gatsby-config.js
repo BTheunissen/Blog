@@ -22,7 +22,8 @@ module.exports = {
       name: 'Ben Theunissen',
       email: 'ben@theunissen.tech',
       twitter: 'https://www.twitter.com/benjtheunissen',
-      github: 'https://www.github.com/btheunissen'
+      github: 'https://www.github.com/btheunissen',
+      linkedin: 'https://www.linkedin.com/in/benjtheunissen'
     }
   },
   plugins: [

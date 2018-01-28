@@ -39,6 +39,7 @@ export const pageQuery = graphql`
           email
           twitter
           github
+          linkedin
         }
       }
     }

@@ -1,41 +1,50 @@
-# back to language cpp to try to bypass osx node failure
-language: cpp
-sudo: false
-env:
-  - export NODE_VERSION="0.10"
-  - export NODE_VERSION="0.12"
-  - export NODE_VERSION="4"
-  - export NODE_VERSION="5"
-os:
-  - linux
-  - osx
-# pre-install to bring in the correct version of node via nvm
-before_install:
-  - git submodule update --init --recursive
-  - git clone https://github.com/creationix/nvm.git ./.nvm
-  - source ./.nvm/nvm.sh
-  - nvm install $NODE_VERSION
-  - nvm use $NODE_VERSION
-  - npm config set python `which python`
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then
-      export CC="gcc-4.8";
-      export CXX="g++-4.8";
-      export LINK="gcc-4.8";
-      export LINKXX="g++-4.8";
-    fi
-  - gcc --version
-  - g++ --version
-# node 4 depends on gcc 4.8
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
-    - gcc-4.8
-# script needed to test, because defaults don't work on osx
-script:
-  - npm install
-  - npm run lint
-  - npm run build
-  
+matrix:
+  include:
+    - language: node_js
+      sudo: false
+      cache:
+        directories:
+        - node_modules
+      install:
+        - npm install
+      script:
+        - npm run lint
+        - npm run build
+    - language: python
+      python:
+        - "3.5"
+      cache: pip
+      install:
+        # Install any dependencies required for building your site here.
+        # `awscli` is required for invalidation of CloudFront distributions.
+        - pip install awscli
+      deploy:
+        - provider: s3
+          on:
+            branch: master
+          # You can refer to environment variables from Travis repo settings!
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          # Name of the S3 bucket to which your site should be uploaded.
+          bucket: www.theunissen.tech
+          # Prevent Travis from deleting your built site so it can be uploaded.
+          skip_cleanup: true
+          # Path to a directory containing your built site.
+          local_dir: public
+          # Set the Cache-Control header.
+          cache_control: "max-age=21600"
+        - provider: s3
+          on:
+            branch: master
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          bucket: blog.theunissen.tech
+          skip_cleanup: true
+          local_dir: public
+          cache_control: "max-age=21600"
+      after_deploy:
+        # Allow `awscli` to make requests to CloudFront.
+        - aws configure set preview.cloudfront true
+        # Invalidate every object in the targeted distribution.
+        - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_1 --paths "/*"
+        - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_2 --paths "/*"

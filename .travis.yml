@@ -1,50 +1,58 @@
-matrix:
-  include:
-    - language: node_js
-      sudo: false
-      cache:
-        directories:
-        - node_modules
-      install:
-        - npm install
-      script:
-        - npm run lint
-        - npm run build
-    - language: python
-      python:
-        - "3.5"
-      cache: pip
-      install:
-        # Install any dependencies required for building your site here.
-        # `awscli` is required for invalidation of CloudFront distributions.
-        - pip install awscli
-      deploy:
-        - provider: s3
-          on:
-            branch: master
-          # You can refer to environment variables from Travis repo settings!
-          access_key_id: $AWS_ACCESS_KEY_ID
-          secret_access_key: $AWS_SECRET_ACCESS_KEY
-          # Name of the S3 bucket to which your site should be uploaded.
-          bucket: www.theunissen.tech
-          # Prevent Travis from deleting your built site so it can be uploaded.
-          skip_cleanup: true
-          # Path to a directory containing your built site.
-          local_dir: public
-          # Set the Cache-Control header.
-          cache_control: "max-age=21600"
-        - provider: s3
-          on:
-            branch: master
-          access_key_id: $AWS_ACCESS_KEY_ID
-          secret_access_key: $AWS_SECRET_ACCESS_KEY
-          bucket: blog.theunissen.tech
-          skip_cleanup: true
-          local_dir: public
-          cache_control: "max-age=21600"
-      after_deploy:
-        # Allow `awscli` to make requests to CloudFront.
-        - aws configure set preview.cloudfront true
-        # Invalidate every object in the targeted distribution.
-        - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_1 --paths "/*"
-        - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_2 --paths "/*"
+sudo: required
+dist: trusty
+language: node_js
+node_js:
+  - "5.5"
+  - "4.2"
+python:
+  - "3.4"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      # nodejs >v4 compiler requirements
+      - g++-4.8
+      - openjdk-7-jdk
+before_install:
+  - sudo apt-get -y install python3-pip python-dev
+  - sudo pip3 install -U setuptools
+  - sudo pip3 install -U virtualenvwrapper
+  - python3 -V
+  - pip3 -V
+install:
+  - pip3 install awscli
+  - npm install
+script:
+  - npm run lint
+  - npm run build
+deploy:
+  - provider: s3
+    on:
+      branch: master
+    # You can refer to environment variables from Travis repo settings!
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    # Name of the S3 bucket to which your site should be uploaded.
+    bucket: www.theunissen.tech
+    # Prevent Travis from deleting your built site so it can be uploaded.
+    skip_cleanup: true
+    # Path to a directory containing your built site.
+    local_dir: public
+    # Set the Cache-Control header.
+    cache_control: "max-age=21600"
+  - provider: s3
+    on:
+      branch: master
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: blog.theunissen.tech
+    skip_cleanup: true
+    local_dir: public
+    cache_control: "max-age=21600"
+after_deploy:
+  # Allow `awscli` to make requests to CloudFront.
+  - aws configure set preview.cloudfront true
+  # Invalidate every object in the targeted distribution.
+  - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_1 --paths "/*"
+  - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_2 --paths "/*"

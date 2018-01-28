@@ -21,7 +21,7 @@ before_install:
   - python3 -V
   - pip3 -V
 install:
-  - pip3 install awscli
+  - sudo pip3 install awscli
   - npm install
 script:
   - npm run lint

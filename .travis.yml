@@ -42,9 +42,10 @@ deploy:
     local_dir: public
     # Set the Cache-Control header.
     cache_control: "max-age=21600"
+    region: ap-southeast-2
 after_deploy:
   # Sync to other bucket
-  - aws s3 sync public s3://blog.theunissen.tech --region=$AWS_DEFAULT_REGION --delete
+  - aws s3 sync public s3://blog.theunissen.tech --region ap-southeast-2 --delete
   # Allow `awscli` to make requests to CloudFront.
   - aws configure set preview.cloudfront true
   # Invalidate every object in the targeted distribution.

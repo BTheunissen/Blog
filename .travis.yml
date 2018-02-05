@@ -1,6 +1,9 @@
 sudo: required
 dist: trusty
 language: node_js
+branches:
+  only: 
+    - master
 node_js:
   - "7"
 python:
@@ -29,8 +32,6 @@ script:
   - npm run build
 deploy:
   - provider: s3
-    on:
-      branch: master
     # You can refer to environment variables from Travis repo settings!
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY

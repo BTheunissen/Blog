@@ -25,14 +25,14 @@ For example, the `Functor` type class is defined in Haskell as,
 
 ```haskell
 class Functor f where
-    fmap :: (a -> b) -> f a -> f b
+    fmap :: (a → b) → f a → f b
 ```
 
 At first this block of characters and symbols will appear intimidating, but the core concept behind Functor is actually pleasantly simple.
 
-Imagine `f` as a programming construct which can hold any amount of data values, a simple example being a list of the values, `(1, 2, 3)`. For that construct to have an instance of the type class `Functor`, a function `fmap` must be defined which takes two arguments `(a -> b)` and `f a`. In Haskell, all functions are [curried](https://wiki.haskell.org/Currying), as such the return type of the `fmap` function is `f b`.
+Imagine `f` as a programming construct which can hold any amount of data values, a simple example being a list of the values, `(1, 2, 3)`. For that construct to have an instance of the type class `Functor`, a function `fmap` must be defined which takes two arguments `(a → b)` and `f a`. In Haskell, all functions are [curried](https://wiki.haskell.org/Currying), as such the return type of the `fmap` function is `f b`.
 
-The initial argument with an arrow (`->`) represents a function which maps any input of a type `a` to a type `b`. The second argument on the other hand is our programming context `f` which 'wraps' an amount of data with the type `a`. From the information I have provided thus far, it may be evident what the `fmap` function is expected to do, we take a provided function which maps all inputs `a` to `b`, and an `f` construct of type `a`, and then produce an `f` of type `b`!
+The initial argument with an arrow (`→`) represents a function which maps any input of a type `a` to a type `b`. The second argument on the other hand is our programming context `f` which 'wraps' an amount of data with the type `a`. From the information I have provided thus far, it may be evident what the `fmap` function is expected to do, we take a provided function which maps all inputs `a` to `b`, and an `f` construct of type `a`, and then produce an `f` of type `b`!
 
 Note: the Functor type class actually has another function with a similar signature to `fmap` which must also be implemented but it has been excluded for the sake of brevity.
 
